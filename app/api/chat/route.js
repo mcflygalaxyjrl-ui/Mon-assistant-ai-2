@@ -23,6 +23,12 @@ export async function POST(req) {
   );
 
   const data = await res.json();
+
+  if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+    console.error('GEMINI STATUS:', res.status);
+    console.error('GEMINI BODY:', JSON.stringify(data));
+  }
+
   const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Je n'ai pas pu générer de réponse (vérifie la clé API et le nom du modèle).";
 
   return Response.json({ reply });
