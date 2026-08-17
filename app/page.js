@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <main style={{ minHeight: '100vh', background: '#0a0a0f', color: '#e8e8f0', display: 'flex', flexDirection: 'column', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ padding: '16px', borderBottom: '1px solid #2a2a3a', fontSize: '13px', color: '#6ee7ff', letterSpacing: '0.05em' }}>
-        ● gemini online
+        ● groq online
       </div>
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {messages.map((m, i) => (
