@@ -27,8 +27,8 @@ export default function Home() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#0a0a0f', color: '#e8e8f0', display: 'flex', flexDirection: 'column', fontFamily: 'system-ui, sans-serif' }}>
-      <div style={{ padding: '16px', borderBottom: '1px solid #2a2a3a', fontSize: '13px', color: '#6ee7ff', letterSpacing: '0.05em' }}>
+    <main style={{ minHeight: '100dvh', background: '#0a0a0f', color: '#e8e8f0', display: 'flex', flexDirection: 'column', fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ padding: '16px', paddingTop: 'max(16px, env(safe-area-inset-top))', borderBottom: '1px solid #2a2a3a', fontSize: '13px', color: '#6ee7ff', letterSpacing: '0.05em' }}>
         ● groq online
       </div>
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -46,12 +46,12 @@ export default function Home() {
         ))}
         {loading && <div style={{ color: '#6ee7ff' }}>...</div>}
       </div>
-      <div style={{ display: 'flex', padding: '12px', borderTop: '1px solid #2a2a3a', gap: '8px' }}>
+      <div style={{ display: 'flex', padding: '12px', paddingBottom: 'max(12px, env(safe-area-inset-bottom))', borderTop: '1px solid #2a2a3a', gap: '8px' }}>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-          style={{ flex: 1, background: '#141420', border: '1px solid #2a2a3a', borderRadius: '8px', padding: '10px', color: '#e8e8f0' }}
+          style={{ flex: 1, background: '#141420', border: '1px solid #2a2a3a', borderRadius: '8px', padding: '10px', color: '#e8e8f0', fontSize: '16px' }}
           placeholder="Écris ton message..."
         />
         <button onClick={sendMessage} style={{ background: '#6ee7ff', border: 'none', borderRadius: '8px', padding: '10px 16px', fontWeight: 'bold' }}>
