@@ -37,7 +37,7 @@ function downsample(buffer, inRate, outRate) {
   return result;
 }
 
-export default function VoiceLive({ onSpeakingChange }) {
+export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
   const [status, setStatus] = useState('idle');
   const [log, setLog] = useState([]);
   const wsRef = useRef(null);
@@ -46,6 +46,8 @@ export default function VoiceLive({ onSpeakingChange }) {
   const processorRef = useRef(null);
   const playCtxRef = useRef(null);
   const playTimeRef = useRef(0);
+  const captionRef = useRef('');
+  const clearTimerRef = useRef(null);
 
   function addLog(line) {
     setLog((l) => [...l.slice(-7), line]);
@@ -103,7 +105,22 @@ export default function VoiceLive({ onSpeakingChange }) {
             playChunk(part.inlineData.data);
           }
         }
-        if (msg?.serverContent?.turnComplete) onSpeakingChange?.(false);
+
+        const transcriptPiece = msg?.serverContent?.outputTranscription?.text;
+        if (transcriptPiece) {
+          clearTimeout(clearTimerRef.current);
+          captionRef.current += transcriptPiece;
+          onCaptionChange?.(captionRef.current);
+        }
+
+        if (msg?.serverContent?.turnComplete) {
+          onSpeakingChange?.(false);
+          clearTimerRef.current = setTimeout(() => {
+            captionRef.current = '';
+            onCaptionChange?.('');
+          }, 1500);
+        }
+
         if (msg?.setupComplete) addLog('setup confirmé par Google');
       } catch (e) {
         addLog('erreur message: ' + e.message);
@@ -162,6 +179,8 @@ export default function VoiceLive({ onSpeakingChange }) {
     wsRef.current?.close();
     setStatus('idle');
     onSpeakingChange?.(false);
+    captionRef.current = '';
+    onCaptionChange?.('');
   }
 
   return (
