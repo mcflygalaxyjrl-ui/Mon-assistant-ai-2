@@ -2,9 +2,11 @@
 import { useState } from 'react';
 import OrionSphere from './components/OrionSphere';
 import VoiceLive from './components/VoiceLive';
+
 export default function Home() {
   const [view, setView] = useState('orb');
   const [testSpeaking, setTestSpeaking] = useState(false);
+  const [caption, setCaption] = useState('');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,11 +40,11 @@ export default function Home() {
 
         <OrionSphere speaking={testSpeaking} size={280} />
 
-        <div style={{ marginTop: '24px', fontSize: '13px', color: '#5a5a6a', textAlign: 'center', minHeight: '20px' }}>
-          {testSpeaking ? 'ORION parle (test)...' : 'En attente'}
+        <div style={{ marginTop: '24px', fontSize: '14px', color: '#9fd8e8', textAlign: 'center', minHeight: '24px', maxWidth: '320px', fontWeight: 300, letterSpacing: '0.01em', lineHeight: '1.4' }}>
+          {caption}
         </div>
 
-        <VoiceLive onSpeakingChange={setTestSpeaking} />
+        <VoiceLive onSpeakingChange={setTestSpeaking} onCaptionChange={setCaption} />
 
         <button onClick={() => setView('chat')} aria-label="Passer en mode texte" style={{ position: 'absolute', bottom: 'max(24px, env(safe-area-inset-bottom))', left: '24px', width: '44px', height: '44px', borderRadius: '50%', background: '#141420', border: '1px solid #2a2a3a', color: '#6ee7ff', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           ⌨
