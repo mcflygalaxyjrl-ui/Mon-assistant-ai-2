@@ -1,6 +1,6 @@
 'use client';
 import { useRef, useState } from 'react';
-
+import VisionHUD from './VisionHUD';
 const SEND_RATE = 16000;
 const RECEIVE_RATE = 24000;
 
@@ -272,6 +272,7 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
       {visionMode && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 10, background: '#000' }}>
           <video ref={videoRef} autoPlay muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <VisionHUD />
           <button onClick={toggleVision} style={{ position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: '20px', background: 'rgba(20,20,32,0.85)', border: '1px solid #2a2a3a', borderRadius: '20px', padding: '8px 16px', color: '#e8e8f0' }}>
             Fermer la caméra
           </button>
