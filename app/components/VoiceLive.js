@@ -53,9 +53,28 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
   const canvasRef = useRef(null);
   const cameraStreamRef = useRef(null);
   const frameIntervalRef = useRef(null);
+  const visionModeRef = useRef(false);
+  const commandBufferRef = useRef('');
 
   function addLog(line) {
     setLog((l) => [...l.slice(-9), line]);
+  }
+
+  function checkVoiceCommand() {
+    const text = commandBufferRef.current.toLowerCase();
+    const mentionsVision = text.includes('vision');
+    const mentionsStart = text.includes('active') || text.includes('lance') || text.includes('ouvre');
+    const mentionsStop = text.includes('arrête') || text.includes('arrete') || text.includes('stop') || text.includes('ferme');
+
+    if (!visionModeRef.current && mentionsVision && mentionsStart) {
+      addLog('commande vocale détectée: activer vision');
+      commandBufferRef.current = '';
+      startVision();
+    } else if (visionModeRef.current && mentionsVision && mentionsStop) {
+      addLog('commande vocale détectée: arrêter vision');
+      commandBufferRef.current = '';
+      stopVision();
+    }
   }
 
   async function start() {
@@ -118,6 +137,12 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
           onCaptionChange?.(captionRef.current);
         }
 
+        const inputPiece = msg?.serverContent?.inputTranscription?.text;
+        if (inputPiece) {
+          commandBufferRef.current = (commandBufferRef.current + inputPiece).slice(-200);
+          checkVoiceCommand();
+        }
+
         if (msg?.serverContent?.turnComplete) {
           onSpeakingChange?.(false);
           clearTimerRef.current = setTimeout(() => {
@@ -169,26 +194,17 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
       const camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       addLog('permission caméra accordée');
       cameraStreamRef.current = camStream;
-      const tracks = camStream.getVideoTracks();
-      addLog('pistes vidéo: ' + tracks.length);
 
+      visionModeRef.current = true;
       setVisionMode(true);
 
       requestAnimationFrame(() => {
         const video = videoRef.current;
-        if (!video) {
-          addLog('erreur: élément vidéo introuvable');
-          return;
-        }
+        if (!video) return;
         video.srcObject = camStream;
         video.muted = true;
         video.playsInline = true;
-        video.onloadedmetadata = () => {
-          addLog('métadonnées: ' + video.videoWidth + 'x' + video.videoHeight);
-        };
-        video.play()
-          .then(() => addLog('lecture vidéo lancée'))
-          .catch((e) => addLog('erreur play(): ' + e.message));
+        video.play().catch((e) => addLog('erreur play(): ' + e.message));
       });
 
       frameIntervalRef.current = setInterval(() => {
@@ -215,11 +231,12 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
     clearInterval(frameIntervalRef.current);
     cameraStreamRef.current?.getTracks().forEach((t) => t.stop());
     cameraStreamRef.current = null;
+    visionModeRef.current = false;
     setVisionMode(false);
   }
 
   function toggleVision() {
-    if (visionMode) stopVision();
+    if (visionModeRef.current) stopVision();
     else startVision();
   }
 
@@ -277,7 +294,7 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
           </button>
           {status === 'listening' && (
             <button onClick={toggleVision} style={{ background: 'transparent', border: '1px solid #2a2a3a', borderRadius: '20px', padding: '8px 16px', color: '#5a5a6a', fontSize: '12px' }}>
-              📷 mode vision (test)
+              📷 mode vision (manuel)
             </button>
           )}
         </div>
