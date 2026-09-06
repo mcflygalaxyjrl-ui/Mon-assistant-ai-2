@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import OrionSphere from './components/OrionSphere';
-
+import VoiceLive from './components/VoiceLive';
 export default function Home() {
   const [view, setView] = useState('orb');
   const [testSpeaking, setTestSpeaking] = useState(false);
@@ -42,9 +42,7 @@ export default function Home() {
           {testSpeaking ? 'ORION parle (test)...' : 'En attente'}
         </div>
 
-        <button onClick={() => setTestSpeaking((s) => !s)} style={{ marginTop: '16px', background: 'transparent', border: '1px solid #2a2a3a', borderRadius: '20px', padding: '6px 14px', color: '#5a5a6a', fontSize: '11px' }}>
-          test pulse (temporaire)
-        </button>
+        <VoiceLive onSpeakingChange={setTestSpeaking} />
 
         <button onClick={() => setView('chat')} aria-label="Passer en mode texte" style={{ position: 'absolute', bottom: 'max(24px, env(safe-area-inset-bottom))', left: '24px', width: '44px', height: '44px', borderRadius: '50%', background: '#141420', border: '1px solid #2a2a3a', color: '#6ee7ff', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           ⌨
