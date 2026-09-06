@@ -16,7 +16,10 @@ export async function GET() {
         expireTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
         liveConnectConstraints: {
           model,
-          config: { responseModalities: ['AUDIO'] },
+          config: {
+            responseModalities: ['AUDIO'],
+            outputAudioTranscription: {},
+          },
         },
         httpOptions: { apiVersion: 'v1alpha' },
       },
