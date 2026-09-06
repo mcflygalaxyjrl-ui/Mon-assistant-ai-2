@@ -55,7 +55,7 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
   const frameIntervalRef = useRef(null);
 
   function addLog(line) {
-    setLog((l) => [...l.slice(-7), line]);
+    setLog((l) => [...l.slice(-9), line]);
   }
 
   async function start() {
@@ -164,15 +164,32 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
   }
 
   async function startVision() {
+    addLog('demande accès caméra...');
     try {
       const camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      addLog('permission caméra accordée');
       cameraStreamRef.current = camStream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = camStream;
-        await videoRef.current.play();
-      }
-      addLog('caméra active');
+      const tracks = camStream.getVideoTracks();
+      addLog('pistes vidéo: ' + tracks.length);
+
       setVisionMode(true);
+
+      requestAnimationFrame(() => {
+        const video = videoRef.current;
+        if (!video) {
+          addLog('erreur: élément vidéo introuvable');
+          return;
+        }
+        video.srcObject = camStream;
+        video.muted = true;
+        video.playsInline = true;
+        video.onloadedmetadata = () => {
+          addLog('métadonnées: ' + video.videoWidth + 'x' + video.videoHeight);
+        };
+        video.play()
+          .then(() => addLog('lecture vidéo lancée'))
+          .catch((e) => addLog('erreur play(): ' + e.message));
+      });
 
       frameIntervalRef.current = setInterval(() => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
@@ -190,7 +207,7 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
         }));
       }, 1000);
     } catch (e) {
-      addLog('erreur caméra: ' + e.message);
+      addLog('erreur caméra: ' + e.name + ' - ' + e.message);
     }
   }
 
@@ -237,10 +254,13 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', width: '100%' }}>
       {visionMode && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 10, background: '#000' }}>
-          <video ref={videoRef} playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          <button onClick={toggleVision} style={{ position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: '20px', background: 'rgba(20,20,32,0.8)', border: '1px solid #2a2a3a', borderRadius: '20px', padding: '8px 16px', color: '#e8e8f0' }}>
+          <video ref={videoRef} autoPlay muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <button onClick={toggleVision} style={{ position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: '20px', background: 'rgba(20,20,32,0.85)', border: '1px solid #2a2a3a', borderRadius: '20px', padding: '8px 16px', color: '#e8e8f0' }}>
             Fermer la caméra
           </button>
+          <div style={{ position: 'absolute', bottom: 'max(16px, env(safe-area-inset-bottom))', left: '16px', right: '16px', fontSize: '10px', color: '#6ee7ff', fontFamily: 'monospace', background: 'rgba(0,0,0,0.6)', padding: '8px', borderRadius: '8px', maxHeight: '140px', overflowY: 'auto' }}>
+            {log.map((line, i) => <div key={i}>{line}</div>)}
+          </div>
         </div>
       )}
       <canvas ref={canvasRef} style={{ display: 'none' }} />
