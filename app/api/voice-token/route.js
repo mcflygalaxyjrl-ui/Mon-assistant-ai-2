@@ -19,6 +19,7 @@ export async function GET() {
           config: {
             responseModalities: ['AUDIO'],
             outputAudioTranscription: {},
+            inputAudioTranscription: {},
           },
         },
         httpOptions: { apiVersion: 'v1alpha' },
