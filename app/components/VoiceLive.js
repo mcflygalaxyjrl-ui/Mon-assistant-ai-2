@@ -39,6 +39,7 @@ function downsample(buffer, inRate, outRate) {
 
 export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
   const [status, setStatus] = useState('idle');
+  const [visionMode, setVisionMode] = useState(false);
   const [log, setLog] = useState([]);
   const wsRef = useRef(null);
   const micCtxRef = useRef(null);
@@ -48,6 +49,10 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
   const playTimeRef = useRef(0);
   const captionRef = useRef('');
   const clearTimerRef = useRef(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const cameraStreamRef = useRef(null);
+  const frameIntervalRef = useRef(null);
 
   function addLog(line) {
     setLog((l) => [...l.slice(-7), line]);
@@ -131,6 +136,7 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
     ws.onclose = (e) => {
       addLog('websocket fermé: code ' + e.code + ' ' + (e.reason || ''));
       setStatus('idle');
+      stopVision();
     };
   }
 
@@ -157,6 +163,49 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
     processor.connect(ctx.destination);
   }
 
+  async function startVision() {
+    try {
+      const camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      cameraStreamRef.current = camStream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = camStream;
+        await videoRef.current.play();
+      }
+      addLog('caméra active');
+      setVisionMode(true);
+
+      frameIntervalRef.current = setInterval(() => {
+        if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        if (!video || !canvas || video.videoWidth === 0) return;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx2d = canvas.getContext('2d');
+        ctx2d.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+        const base64 = dataUrl.split(',')[1];
+        wsRef.current.send(JSON.stringify({
+          realtimeInput: { mediaChunks: [{ mimeType: 'image/jpeg', data: base64 }] },
+        }));
+      }, 1000);
+    } catch (e) {
+      addLog('erreur caméra: ' + e.message);
+    }
+  }
+
+  function stopVision() {
+    clearInterval(frameIntervalRef.current);
+    cameraStreamRef.current?.getTracks().forEach((t) => t.stop());
+    cameraStreamRef.current = null;
+    setVisionMode(false);
+  }
+
+  function toggleVision() {
+    if (visionMode) stopVision();
+    else startVision();
+  }
+
   function playChunk(base64) {
     const ctx = playCtxRef.current;
     const int16 = fromBase64Int16(base64);
@@ -173,6 +222,7 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
   }
 
   function stop() {
+    stopVision();
     processorRef.current?.disconnect();
     micCtxRef.current?.close();
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -185,15 +235,32 @@ export default function VoiceLive({ onSpeakingChange, onCaptionChange }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', width: '100%' }}>
+      {visionMode && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10, background: '#000' }}>
+          <video ref={videoRef} playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <button onClick={toggleVision} style={{ position: 'absolute', top: 'max(24px, env(safe-area-inset-top))', right: '20px', background: 'rgba(20,20,32,0.8)', border: '1px solid #2a2a3a', borderRadius: '20px', padding: '8px 16px', color: '#e8e8f0' }}>
+            Fermer la caméra
+          </button>
+        </div>
+      )}
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
+
       {status === 'idle' && (
         <button onClick={start} style={{ background: '#6ee7ff', border: 'none', borderRadius: '20px', padding: '10px 20px', fontWeight: 'bold' }}>
           Démarrer la conversation
         </button>
       )}
       {status !== 'idle' && (
-        <button onClick={stop} style={{ background: 'transparent', border: '1px solid #2a2a3a', borderRadius: '20px', padding: '8px 16px', color: '#e8e8f0' }}>
-          {status === 'connecting' ? 'Connexion...' : 'Raccrocher'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={stop} style={{ background: 'transparent', border: '1px solid #2a2a3a', borderRadius: '20px', padding: '8px 16px', color: '#e8e8f0' }}>
+            {status === 'connecting' ? 'Connexion...' : 'Raccrocher'}
+          </button>
+          {status === 'listening' && (
+            <button onClick={toggleVision} style={{ background: 'transparent', border: '1px solid #2a2a3a', borderRadius: '20px', padding: '8px 16px', color: '#5a5a6a', fontSize: '12px' }}>
+              📷 mode vision (test)
+            </button>
+          )}
+        </div>
       )}
       <div style={{ fontSize: '10px', color: '#5a5a6a', fontFamily: 'monospace', textAlign: 'left', maxWidth: '90%', maxHeight: '110px', overflowY: 'auto' }}>
         {log.map((line, i) => <div key={i}>{line}</div>)}
