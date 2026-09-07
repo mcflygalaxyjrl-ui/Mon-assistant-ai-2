@@ -37,50 +37,56 @@ export default function VisionHUD() {
 
       <svg viewBox="0 0 400 800" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
 
-        {/* grande croix diagonale, coin à coin */}
-        <g stroke="#cfeffa" strokeWidth="0.5" opacity="0.2">
+        {/* grande croix diagonale */}
+        <g stroke="#cfeffa" strokeWidth="0.6" opacity="0.28">
           <line x1="0" y1="0" x2="400" y2="800" />
           <line x1="400" y1="0" x2="0" y2="800" />
         </g>
 
-        {/* arcs en pointillés qui longent les bords, dans chaque coin */}
-        {cornerArc(0, 0, 130, 5, 85, 9, 0)}
-        {cornerArc(0, 0, 190, 5, 85, 8, 0.3)}
-        {cornerArc(400, 0, 130, 95, 175, 9, 0.6)}
-        {cornerArc(400, 0, 190, 95, 175, 8, 0.9)}
-        {cornerArc(0, 800, 130, 275, 355, 9, 1.2)}
-        {cornerArc(0, 800, 190, 275, 355, 8, 1.5)}
-        {cornerArc(400, 800, 130, 185, 265, 9, 1.8)}
-        {cornerArc(400, 800, 190, 185, 265, 8, 2.1)}
+        {/* arcs en pointillés dans les coins */}
+        {cornerArc(0, 0, 90, 5, 85, 8, 0)}
+        {cornerArc(0, 0, 140, 5, 85, 7, 0.3)}
+        {cornerArc(400, 0, 90, 95, 175, 8, 0.6)}
+        {cornerArc(400, 0, 140, 95, 175, 7, 0.9)}
+        {cornerArc(0, 800, 90, 275, 355, 8, 1.2)}
+        {cornerArc(0, 800, 140, 275, 355, 7, 1.5)}
+        {cornerArc(400, 800, 90, 185, 265, 8, 1.8)}
+        {cornerArc(400, 800, 140, 185, 265, 7, 2.1)}
 
-        {/* grand cercle fin, oscille doucement */}
-        <g className="orion-sway-a" opacity="0.3">
-          <circle cx="200" cy="400" r="260" fill="none" stroke="#8fdcef" strokeWidth="0.6" />
-        </g>
-        <g className="orion-sway-b" opacity="0.18">
-          <circle cx="200" cy="400" r="240" fill="none" stroke="#8fdcef" strokeWidth="0.5" />
+        {/* traits horizontaux pointillés au milieu, gauche et droite */}
+        <g stroke="#cfeffa" strokeWidth="1" opacity="0.35" strokeDasharray="4 5">
+          <line x1="0" y1="400" x2="60" y2="400" />
+          <line x1="340" y1="400" x2="400" y2="400" />
         </g>
 
-        {/* repères haut */}
-        <g stroke="#cfeffa" strokeWidth="0.9" opacity="0.4">
-          <line x1="185" y1="26" x2="185" y2="42" />
-          <line x1="200" y1="20" x2="200" y2="46" />
-          <line x1="215" y1="26" x2="215" y2="42" />
+        {/* deux cercles segmentés, larges, qui débordent du cadre */}
+        <g className="orion-sway-a" opacity="0.4">
+          <circle cx="200" cy="400" r="280" fill="none" stroke="#5ec8e8" strokeWidth="1.1" strokeDasharray="70 35 40 45" />
         </g>
-        <g fill="#e05252" opacity="0.55">
-          <rect x="181" y="48" width="4" height="4" transform="rotate(45 183 50)" />
-          <rect x="215" y="48" width="4" height="4" transform="rotate(45 217 50)" />
+        <g className="orion-sway-b" opacity="0.3">
+          <circle cx="200" cy="400" r="245" fill="none" stroke="#5ec8e8" strokeWidth="0.9" strokeDasharray="55 40 30 50" />
         </g>
 
-        {/* repères bas (miroir) */}
-        <g stroke="#cfeffa" strokeWidth="0.9" opacity="0.4">
-          <line x1="185" y1="774" x2="185" y2="758" />
-          <line x1="200" y1="780" x2="200" y2="754" />
-          <line x1="215" y1="774" x2="215" y2="758" />
+        {/* repère haut : croix centrale + branches qui s'écartent */}
+        <g stroke="#cfeffa" strokeWidth="1" opacity="0.45">
+          <line x1="200" y1="8" x2="200" y2="42" />
+          <line x1="200" y1="20" x2="180" y2="55" />
+          <line x1="200" y1="20" x2="220" y2="55" />
         </g>
-        <g fill="#e05252" opacity="0.55">
-          <rect x="181" y="752" width="4" height="4" transform="rotate(45 183 754)" />
-          <rect x="215" y="752" width="4" height="4" transform="rotate(45 217 754)" />
+        <g fill="#e05252" opacity="0.6">
+          <rect x="180" y="62" width="4" height="4" transform="rotate(45 182 64)" />
+          <rect x="216" y="62" width="4" height="4" transform="rotate(45 218 64)" />
+        </g>
+
+        {/* repère bas, miroir exact */}
+        <g stroke="#cfeffa" strokeWidth="1" opacity="0.45">
+          <line x1="200" y1="792" x2="200" y2="758" />
+          <line x1="200" y1="780" x2="180" y2="745" />
+          <line x1="200" y1="780" x2="220" y2="745" />
+        </g>
+        <g fill="#e05252" opacity="0.6">
+          <rect x="180" y="734" width="4" height="4" transform="rotate(45 182 736)" />
+          <rect x="216" y="734" width="4" height="4" transform="rotate(45 218 736)" />
         </g>
       </svg>
 
