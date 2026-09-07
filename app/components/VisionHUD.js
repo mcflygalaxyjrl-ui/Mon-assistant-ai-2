@@ -29,42 +29,36 @@ export default function VisionHUD() {
     <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
       <style>{`
         @keyframes orionTwinkle { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.75; } }
-        @keyframes orionSway { 0% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } 100% { transform: rotate(-5deg); } }
-        @keyframes orionSwayRev { 0% { transform: rotate(5deg); } 50% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
-        .orion-sway-a { transform-origin: 200px 400px; animation: orionSway 9s ease-in-out infinite; }
-        .orion-sway-b { transform-origin: 200px 400px; animation: orionSwayRev 12s ease-in-out infinite; }
+        @keyframes orionSway { 0% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } 100% { transform: rotate(-4deg); } }
+        @keyframes orionSwayRev { 0% { transform: rotate(4deg); } 50% { transform: rotate(-4deg); } 100% { transform: rotate(4deg); } }
+        .orion-sway-a { transform-origin: 200px 400px; animation: orionSway 10s ease-in-out infinite; }
+        .orion-sway-b { transform-origin: 200px 400px; animation: orionSwayRev 13s ease-in-out infinite; }
       `}</style>
 
       <svg viewBox="0 0 400 800" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
 
-        {/* lignes diagonales depuis les coins */}
-        <g stroke="#cfeffa" strokeWidth="0.5" opacity="0.22">
-          <line x1="0" y1="0" x2="230" y2="230" />
-          <line x1="0" y1="0" x2="130" y2="330" />
-          <line x1="400" y1="0" x2="170" y2="230" />
-          <line x1="400" y1="0" x2="270" y2="330" />
-          <line x1="0" y1="800" x2="230" y2="570" />
-          <line x1="0" y1="800" x2="130" y2="470" />
-          <line x1="400" y1="800" x2="170" y2="570" />
-          <line x1="400" y1="800" x2="270" y2="470" />
+        {/* grande croix diagonale, coin à coin */}
+        <g stroke="#cfeffa" strokeWidth="0.5" opacity="0.2">
+          <line x1="0" y1="0" x2="400" y2="800" />
+          <line x1="400" y1="0" x2="0" y2="800" />
         </g>
 
-        {/* arcs en pointillés dans les coins */}
-        {cornerArc(30, 30, 60, 0, 90, 6, 0)}
-        {cornerArc(370, 30, 60, 90, 180, 6, 0.3)}
-        {cornerArc(30, 770, 60, 270, 360, 6, 0.6)}
-        {cornerArc(370, 770, 60, 180, 270, 6, 0.9)}
-        {cornerArc(30, 30, 95, 0, 90, 5, 1.1)}
-        {cornerArc(370, 30, 95, 90, 180, 5, 1.4)}
-        {cornerArc(30, 770, 95, 270, 360, 5, 1.7)}
-        {cornerArc(370, 770, 95, 180, 270, 5, 2.0)}
+        {/* arcs en pointillés qui longent les bords, dans chaque coin */}
+        {cornerArc(0, 0, 130, 5, 85, 9, 0)}
+        {cornerArc(0, 0, 190, 5, 85, 8, 0.3)}
+        {cornerArc(400, 0, 130, 95, 175, 9, 0.6)}
+        {cornerArc(400, 0, 190, 95, 175, 8, 0.9)}
+        {cornerArc(0, 800, 130, 275, 355, 9, 1.2)}
+        {cornerArc(0, 800, 190, 275, 355, 8, 1.5)}
+        {cornerArc(400, 800, 130, 185, 265, 9, 1.8)}
+        {cornerArc(400, 800, 190, 185, 265, 8, 2.1)}
 
-        {/* arcs de cercle qui oscillent doucement */}
-        <g className="orion-sway-a" opacity="0.28">
-          <circle cx="200" cy="400" r="150" fill="none" stroke="#6ee7ff" strokeWidth="0.6" strokeDasharray="90 40" />
+        {/* grand cercle fin, oscille doucement */}
+        <g className="orion-sway-a" opacity="0.3">
+          <circle cx="200" cy="400" r="260" fill="none" stroke="#8fdcef" strokeWidth="0.6" />
         </g>
-        <g className="orion-sway-b" opacity="0.2">
-          <circle cx="200" cy="400" r="185" fill="none" stroke="#6ee7ff" strokeWidth="0.5" strokeDasharray="70 60" />
+        <g className="orion-sway-b" opacity="0.18">
+          <circle cx="200" cy="400" r="240" fill="none" stroke="#8fdcef" strokeWidth="0.5" />
         </g>
 
         {/* repères haut */}
@@ -74,8 +68,8 @@ export default function VisionHUD() {
           <line x1="215" y1="26" x2="215" y2="42" />
         </g>
         <g fill="#e05252" opacity="0.55">
-          <rect x="181" y="50" width="4" height="4" transform="rotate(45 183 52)" />
-          <rect x="215" y="50" width="4" height="4" transform="rotate(45 217 52)" />
+          <rect x="181" y="48" width="4" height="4" transform="rotate(45 183 50)" />
+          <rect x="215" y="48" width="4" height="4" transform="rotate(45 217 50)" />
         </g>
 
         {/* repères bas (miroir) */}
@@ -85,8 +79,8 @@ export default function VisionHUD() {
           <line x1="215" y1="774" x2="215" y2="758" />
         </g>
         <g fill="#e05252" opacity="0.55">
-          <rect x="181" y="746" width="4" height="4" transform="rotate(45 183 748)" />
-          <rect x="215" y="746" width="4" height="4" transform="rotate(45 217 748)" />
+          <rect x="181" y="752" width="4" height="4" transform="rotate(45 183 754)" />
+          <rect x="215" y="752" width="4" height="4" transform="rotate(45 217 754)" />
         </g>
       </svg>
 
