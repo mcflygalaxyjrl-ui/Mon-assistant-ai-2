@@ -20,6 +20,11 @@ export async function GET() {
             responseModalities: ['AUDIO'],
             outputAudioTranscription: {},
             inputAudioTranscription: {},
+            speechConfig: {
+              voiceConfig: {
+                prebuiltVoiceConfig: { voiceName: 'Charon' },
+              },
+            },
           },
         },
         httpOptions: { apiVersion: 'v1alpha' },
